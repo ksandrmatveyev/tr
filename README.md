@@ -23,7 +23,10 @@ Short brief, that show what I use:
 - `updade_stack` function with parameters, which reads valid template file and updates stack with capabilities (hardcoded). Then set waiter using set_waiter function
 - `delete_stack` function with parameters, which checks if stack exists and deletes stack. Then set waiter using set_waiter function
 - `main` function as entry point, where we get arguments fom parsers, configure logging and handle all exceptions from stack_exists, create_stack, updade_stack, delete_stack
-- `if __name__ == '__main__'`, which run main function
+- `if __name__ == '__main__'`, which run main function  
+###Using examples
+Windows: `stack_wrapper.py StackName TemplatePath.json --log INFO --logfile log.log`  
+Linux: `./stack_wrapper.py StackName TemplatePath.json --log INFO --logfile log.log`  
 #### Note:
 Don't handle parameters for template (try to handle the in part2 of this task) and don't handle template file name, which can based on stack name (leave an opportunity of setting different names)  
 Improvements since last commit:  
