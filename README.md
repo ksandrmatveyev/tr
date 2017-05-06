@@ -22,7 +22,7 @@ The stack structure is stored in a file (yaml) and  includes following:
      - `--config` with default values as `config.yaml` from current directory
      - for `--log`  for setting log level to config. Must use `getattr()` function inside `main()` fucntion, otherwise get error. Also used predefined variants for log level
      - `logfile` with None(STDOUT) as default value  
-   **Note:** _help stdout. (if we don't use any cli parameter, we get error without that)_
+  **Note:** _help stdout. (if we don't use any cli parameter, we get error without that)_
    - `open_file` function, which try open and readtemplate file. If OK, close file and return it, otherwise get exception. 
    - `stack_exists` function,which get response from AWS if stack exists. Needed for `delete_stack` function, which show us no error, if stack doesn't exists
    - `set_waiter` function, which try to create waiter and waite for AWS response, otherwise exception
