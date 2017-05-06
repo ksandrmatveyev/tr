@@ -24,7 +24,7 @@ Short brief, that show what I use:
 - `delete_stack` function with parameters, which checks if stack exists and deletes stack. Then set waiter using set_waiter function
 - `main` function as entry point, where we get arguments fom parsers, configure logging and handle all exceptions from stack_exists, create_stack, updade_stack, delete_stack
 - `if __name__ == '__main__'`, which run main function  
-###Using examples
+### Using examples
 Windows: `stack_wrapper.py StackName TemplatePath.json --log INFO --logfile log.log`  
 Linux: `./stack_wrapper.py StackName TemplatePath.json --log INFO --logfile log.log`  
 #### Note:
