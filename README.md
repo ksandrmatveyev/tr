@@ -20,10 +20,9 @@ The stack structure is stored in a file (yaml) and  includes following:
 3. `stack_wrapper.py`, which include:
    - subparsers, which allow using defaults parameters such as functions. But we can't use them with  [parent's parsers](https://docs.python.org/3/library/argparse.html#parents) (get heap of cli parameters). Has arguments below:
      - `--config` with default values as `config.yaml` from current directory
-     - for `--log` must use `getattr()` for setting log level to config, otherwise get error. Also used predefined variants for `--log`
+     - for `--log`  for setting log level to config. Must use `getattr()` function inside `main()` fucntion, otherwise get error. Also used predefined variants for log level
      - `logfile` with None(STDOUT) as default value
-   #### Note: 
-   help stdout. (if we don't use any cli parameter, we get error without that)
+   *Note:* _help stdout. (if we don't use any cli parameter, we get error without that)_
    - `open_file` function, which try open and readtemplate file. If OK, close file and return it, otherwise get exception. 
    - `stack_exists` function,which get response from AWS if stack exists. Needed for `delete_stack` function, which show us no error, if stack doesn't exists
    - `set_waiter` function, which try to create waiter and waite for AWS response, otherwise exception
