@@ -46,6 +46,7 @@ The stack structure is stored in a file (yaml) and  includes following:
        - reads valid template file and creates stack with
        - if some stack already exists, continue creating with next. 
          - set waiter using set_waiter()  
+
 **Note:** capabilities (hard coded for now)
    - `updade_stack` function, which updates dependent stacks consistently, if those stacks are already exist. Details:
      - use get_config(),
@@ -57,6 +58,7 @@ The stack structure is stored in a file (yaml) and  includes following:
        - reads valid template file and creates stack with
        - if those stacks are already exist, updating them. 
          - set waiter using set_waiter()  
+
 **Note:** capabilities (hard coded for now)
    - `delete_stack` function, which deletes dependent stacks consistently, if those stacks are already exist. Details:
      - use get_config(),
