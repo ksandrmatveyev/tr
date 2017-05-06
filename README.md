@@ -45,8 +45,8 @@ The stack structure is stored in a file (yaml) and  includes following:
        - get parameters by match_parameters()
        - reads valid template file and creates stack with
        - if some stack already exists, continue creating with next. 
-         - set waiter using set_waiter()    
-  **Note:** capabilities (hard coded for now)
+         - set waiter using set_waiter()  
+**Note:** capabilities (hard coded for now)
    - `updade_stack` function, which updates dependent stacks consistently, if those stacks are already exist. Details:
      - use get_config(),
      - resolve_create_dependencies(),
@@ -56,8 +56,8 @@ The stack structure is stored in a file (yaml) and  includes following:
        - get parameters by match_parameters()
        - reads valid template file and creates stack with
        - if those stacks are already exist, updating them. 
-         - set waiter using set_waiter()    
-  **Note:** capabilities (hard coded for now)
+         - set waiter using set_waiter()  
+**Note:** capabilities (hard coded for now)
    - `delete_stack` function, which deletes dependent stacks consistently, if those stacks are already exist. Details:
      - use get_config(),
      - get_dict_of_lists_dependency(),
@@ -66,7 +66,7 @@ The stack structure is stored in a file (yaml) and  includes following:
        - if those stacks are already exist, updating them.
          - set waiter using set_waiter()
    - `main` function as entry point, where we get arguments fom parsers, configure logging and handle all exceptions from stack_exists, create_stack, updade_stack, delete_stack.  
-  **Note: exit point 5**
+**Note: exit point 5**
    - `if __name__ == '__main__'`, which run main function  
 ### Using examples
 Windows: `python stack_wrapper.py create-stack StackName --config config.yaml --log INFO --logfile log.log`  
