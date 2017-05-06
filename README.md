@@ -1,15 +1,17 @@
 # Python task
-### Part1 of task
-The script should create a stack from the template and wait until the stack status changes from "IN PROGRESS" to "COMPLETE" or "FAILED".  
-You can find the detailed description of the parameters below:  
-- action (create, update, delete);
-- stack name;
-- template file name (can based on the stack name);
-- stack parameters;
-- log level (info, debug, error; by default info);
-- log file name (by default to stdout);  
+### Part2 of task
+Add to the script the ability to work with stack sequences. This will avoid errors with manually managing a large set of stacks. The script should performe following steps:  
+- read the structure of the stacks
+- validate the templates
+- determine which the parameters are missing in the structure
+- perform an action (create or delete) with the target stack and all dependencies if the above steps are completed successfully
+The stack structure is stored in a file (yaml) and  includes following:  
+- stack names
+- template files (can based on stack name)
+- dependencies (the order of creation and deletion)
+- parameters passed to the stack
 ### Solution
-"stack_wrapper.py" in "part1" fodler  
+"stack_wrapper.py"
 Short brief, that show what I use:  
 - cloudformation templates for testing
 - subparsers. They allow using defaults parameters such as functions. But we can't use them with  [parent's parsers](https://docs.python.org/3/library/argparse.html#parents) (get heap of cli parameters)
@@ -25,12 +27,11 @@ Short brief, that show what I use:
 - `main` function as entry point, where we get arguments fom parsers, configure logging and handle all exceptions from stack_exists, create_stack, updade_stack, delete_stack
 - `if __name__ == '__main__'`, which run main function  
 ### Using examples
-Windows: `stack_wrapper.py StackName TemplatePath.json --log INFO --logfile log.log`  
-Linux: `./stack_wrapper.py StackName TemplatePath.json --log INFO --logfile log.log`  
+Windows: `python stack_wrapper.py create-stack StackName --config config.yaml --log INFO --logfile log.log`  
+Linux: `./stack_wrapper.py create-stack StackName --config config.yaml --log INFO --logfile log.log`  
 #### Note:
 Don't handle parameters for template (try to handle the in part2 of this task) and don't handle template file name, which can based on stack name (leave an opportunity of setting different names)  
 Improvements since last commit:  
 - handled almost all exceptions from functions in main function
 - removed checking of log level and log file arguments. They are not needed
 - added dictionary for waiters and constants for logging and stack functions
- 
