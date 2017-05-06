@@ -13,10 +13,10 @@ The stack structure is stored in a file (yaml) and  includes following:
 ### Solution
 1. Cloudformation templates `*.json` from [salstack task](aws_training/final/cloudformation-stacks/README.md) for testing (in "examples" folder only a few templates)
 2. `config.yaml`, which include:
- - `name` - stack names
-  - `template` - file paths to cloudformation templates (current directory)
-  - `require` - dependency from other stack (`~` - no dependency)
-  - `parameters` - parameter list of key-value pairs (~ - no parameters)
+   - `name` - stack names
+   - `template` - file paths to cloudformation templates (current directory)
+   - `require` - dependency from other stack (`~` - no dependency)
+   - `parameters` - parameter list of key-value pairs (~ - no parameters)
 3. `stack_wrapper.py`, which include:
   - subparsers, which allow using defaults parameters such as functions. But we can't use them with  [parent's parsers](https://docs.python.org/3/library/argparse.html#parents) (get heap of cli parameters)
    - for `--log` must use `getattr()` for setting log level to config, otherwise get error
