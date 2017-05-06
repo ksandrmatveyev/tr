@@ -22,10 +22,16 @@ The stack structure is stored in a file (yaml) and  includes following:
      - `--config` with default values as `config.yaml` from current directory
      - for `--log`  for setting log level to config. Must use `getattr()` function inside `main()` fucntion, otherwise get error. Also used predefined variants for log level
      - `logfile` with None(STDOUT) as default value  
-  **Note:** _help stdout. (if we don't use any cli parameter, we get error without that)_
-   - `open_file` function, which try open and readtemplate file. If OK, close file and return it, otherwise get exception. 
-   - `stack_exists` function,which get response from AWS if stack exists. Needed for `delete_stack` function, which show us no error, if stack doesn't exists
-   - `set_waiter` function, which try to create waiter and waite for AWS response, otherwise exception
+  **Note:** added _help stdout. (if we don't use any cli parameter, we get error without that)_
+   - `open_file()` function, which try open and read template file. If OK, close file and return it, otherwise get exception and exit. **Note:** exit point 1
+   - `get_template_params()` fucntion, which validate template (using validate_template() function and read  template as parameter) and get parameters from dictionary by key `Parameters`. If default value doesn't exists, set empty value. Return new sorted list of key-value pairs (Parameter: value)
+   - `get_config()` fucntion, which try open and read yaml config file. If OK, return read config, otherwise exception and exit. **Note:** exit point 2
+   - `match_parameters()` fucntion, which try to get template parameters (using `get_template_params()` fucntion) by key and search them in config file (if exists, use parameter value from config file). If OK, return list of dictionaries (key-value pairs), otherwise exception and exit. **Note:** exit point 3
+   - `stack_exists()` function, which get response from AWS if stack exists. Needed for action stack functions. Also, It allows us continue create/update from next stack, if previuos stack already exists or delete stack if it already exists. Return True/False
+   - `set_waiter` function, which try to create waiter and waite for AWS response, otherwise exception and exit. **Note:** exit point 4
+   - `get_dict_of_lists_dependency()` function, which returns dictionary of lists as value for each key from read config file (as fucntion parameter). Needed for creating some "chain" for deleting stacks
+   - `resolve_create_dependencies()` fucntion, which returns list of stack dependencies chain from read config for creating of assigned stack by key 'require' (empty if value doesn't exist)
+   - `resolve_delete_dependencies()` funcion, which returns list of stack dependencies chain from dictionary (which `get_dict_of_lists_dependency()` returns) for deleting of assigned stack
    - `create_stack` function with parameters, which reads valid template file and creates stack with capabilities (hardcoded). Then set waiter using set_waiter function
    - `updade_stack` function with parameters, which reads valid template file and updates stack with capabilities (hardcoded). Then set waiter using set_waiter function
    - `delete_stack` function with parameters, which checks if stack exists and deletes stack. Then set waiter using set_waiter function
