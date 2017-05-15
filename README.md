@@ -1,31 +1,33 @@
-├───app1
-│   └───etc
-│       └───network
+# step2
+├ -app1
+│   └ -etc
+│       └ -network
 │               interfaces
 │
-├───app2
-│   └───etc
-│       └───network
+├ -app2
+│   └ -etc
+│       └ -network
 │               interfaces
 │
-└───gateway
+└ -gateway
     │   iptables.sh
     │
-    └───etc
-        ├───bind
+    └ -etc
+        ├ -bind
         │       forward.bind
         │       named.conf.local
         │       named.conf.options
         │       reverse.bind
         │
-        ├───default
+        ├ -default
         │       isc-dhcp-server
         │
-        ├───dhcp
+        ├ -dhcp
         │       dhcpd.conf
         │
-        ├───network
+        ├ -network
         │       interfaces
         │
-        └───sysctl.d
+        └ -sysctl.d
                 60-ipforward.conf
+
