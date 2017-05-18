@@ -40,19 +40,29 @@
 2. Install `isc-dhcp-server` (dhcp server) and `bind9` (dns server)
 3. Added files from needed folders (called as VMs) to each VM
 4. Restarted VMs (better) or restart services (isc-dhcp-server, networks, bind9, rsyslog)
-5. Added cronjobs (`crontab /home/vagrant/<name>_cron`)
+5. On Gateway: ran `/home/vagrant/first_deploy-keys.sh` for establishing first ssh connections with created keys (needed entering of password to every node). **Note:** this script is preparing nodes for redeploying of ssh keys only 
+6. Added cronjobs (`crontab /home/vagrant/<name>_cron`)
 
 ### Explanation:
- - On Apps:
+ - On **Apps**:
    - added network interface, which get configuration from dhcp (`/etc/network/interfaces`)
    - Added pre up iptables rules (from file `/etc/iptables.rules`), which logged all incoming http traffic: ```-I INPUT -i eth0 -p tcp --dport 80 -j LOG --log-prefix "iptables: HTTP IN " --log-level 4```. Used `--log-level 4` for separating this section of log from main syslog  
    - Configured logrotate for daily backuping and compressing. Also delete log backups, which older than 1 week (`/etc/logrotate.d/rsyslog`)
    - Checked if gateway available (using `/home/vagrant/ifavailable.sh`) every minute with cronjob `home/vagrant/gateway_avail_cron`
    - Configured rsyslog for deliverying logs (from cronjob, iptables and ssh activities) to gateway rsyslog (`/etc/rsyslog.d/loghost.conf`)
- - On Gateway VM:
+ - On **Gateway VM**:
    - defined 2 internal network interfaces (/etc/network/interfaces):
      - static eth1 (192.168.10.50/26)
      - static eth2 (10.0.0.45/26)
+     - also added pre up iptables rules from `/etc/iptables.rules` for eth0 (nat) interface
+     - ```
+       #!/bin/bash
+       iptables -A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT &&\
+       iptables -A FORWARD -i eth2 -o eth0 -j ACCEPT &&\
+       iptables -A FORWARD -i eth1 -o eth0 -j REJECT &&\
+       iptables -A FORWARD -i eth0 -o eth1 -j REJECT &&\
+       iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+	   ```
    - after installing `isc-dhcp-server`
      - enabled serving DHCP requests on eth1 and eth2 (/etc/default/isc-dhcp-server)
      - configured dhcpd configuration (/etc/dhcp/dhcpd.conf):
