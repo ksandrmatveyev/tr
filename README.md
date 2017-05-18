@@ -16,7 +16,7 @@
     - machines from private network 2 can access to internet
     - restrict access from network 2 to google.com and logging all attempts to do that
   - rsyslog
-    - receive logs from all nodes and store in /opt/logs/<ip-or-host>/<date>.log
+    - receive logs from all nodes and store in `/opt/logs/<ip-or-host>/<date>.log`
   - SSH
     - write a script to generate new ssh keys and deploy them to the app nodes (from the cron job, every 15 minutes)
     - script should change the ssh-keys if there are no ssh connections
@@ -48,14 +48,14 @@
    - added network interface, which get configuration from dhcp (`/etc/network/interfaces`)
    - Added pre up iptables rules (from file `/etc/iptables.rules`), which logged all incoming http traffic: 
    - ```
-   -I INPUT -i eth0 -p tcp --dport 80 -j LOG --log-prefix "iptables: HTTP IN " --log-level 4
-   ```
+     sudo iptables -I INPUT -i eth0 -p tcp --dport 80 -j LOG --log-prefix "iptables: HTTP IN " --log-level 4
+     ```
    -**Note:** Used `--log-level 4` for separating this section of log from main syslog  
    - Configured logrotate for daily backuping and compressing. Also delete log backups, which older than 1 week (`/etc/logrotate.d/rsyslog`)
    - Checked if gateway available (using `/home/vagrant/ifavailable.sh`) every minute with cronjob `home/vagrant/gateway_avail_cron`
    - Configured rsyslog for deliverying logs (from cronjob, iptables and ssh activities) to gateway rsyslog (`/etc/rsyslog.d/loghost.conf`)
  - On **Gateway VM**:
-   - defined 2 internal network interfaces (/etc/network/interfaces):
+   - defined 2 internal network interfaces (`/etc/network/interfaces`):
      - static eth1 (192.168.10.50/26)
      - static eth2 (10.0.0.45/26)
      - also added pre up iptables rules from `/etc/iptables.rules` for eth0 (nat) interface, which enable nat for eth0, disable nat access for eth1, logging then drop `google.com` requests for eth2, which get nat access for eth2
@@ -68,6 +68,7 @@
        sudo iptables -A FORWARD -i eth2 -o eth0 -m string --string "google.com" --algo kmp -j DROP &&\
        sudo iptables -A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT &&\
        sudo iptables -A FORWARD -i eth2 -o eth0 -j ACCEPT
+       ```
    - after installing `isc-dhcp-server`
      - enabled serving DHCP requests on eth1 and eth2 (/etc/default/isc-dhcp-server)
      - configured dhcpd configuration (/etc/dhcp/dhcpd.conf):
