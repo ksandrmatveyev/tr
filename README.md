@@ -46,7 +46,11 @@
 ### Explanation:
  - On **Apps**:
    - added network interface, which get configuration from dhcp (`/etc/network/interfaces`)
-   - Added pre up iptables rules (from file `/etc/iptables.rules`), which logged all incoming http traffic: ```-I INPUT -i eth0 -p tcp --dport 80 -j LOG --log-prefix "iptables: HTTP IN " --log-level 4```. Used `--log-level 4` for separating this section of log from main syslog  
+   - Added pre up iptables rules (from file `/etc/iptables.rules`), which logged all incoming http traffic: 
+   - ```
+   -I INPUT -i eth0 -p tcp --dport 80 -j LOG --log-prefix "iptables: HTTP IN " --log-level 4
+   ```
+   -**Note:** Used `--log-level 4` for separating this section of log from main syslog  
    - Configured logrotate for daily backuping and compressing. Also delete log backups, which older than 1 week (`/etc/logrotate.d/rsyslog`)
    - Checked if gateway available (using `/home/vagrant/ifavailable.sh`) every minute with cronjob `home/vagrant/gateway_avail_cron`
    - Configured rsyslog for deliverying logs (from cronjob, iptables and ssh activities) to gateway rsyslog (`/etc/rsyslog.d/loghost.conf`)
@@ -54,15 +58,16 @@
    - defined 2 internal network interfaces (/etc/network/interfaces):
      - static eth1 (192.168.10.50/26)
      - static eth2 (10.0.0.45/26)
-     - also added pre up iptables rules from `/etc/iptables.rules` for eth0 (nat) interface
+     - also added pre up iptables rules from `/etc/iptables.rules` for eth0 (nat) interface, which enable nat for eth0, disable nat access for eth1, logging then drop `google.com` requests for eth2, which get nat access for eth2
      - ```
-       #!/bin/bash
-       iptables -A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT &&\
-       iptables -A FORWARD -i eth2 -o eth0 -j ACCEPT &&\
-       iptables -A FORWARD -i eth1 -o eth0 -j REJECT &&\
-       iptables -A FORWARD -i eth0 -o eth1 -j REJECT &&\
-       iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-	   ```
+       #! /bin/bash
+       sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE &&\
+       sudo iptables -A FORWARD -i eth1 -o eth0 -j REJECT &&\
+       sudo iptables -A FORWARD -i eth0 -o eth1 -j REJECT &&\
+       sudo iptables -A FORWARD -i eth2 -o eth0 -m string --string "google.com" --algo kmp -j LOG --log-prefix "iptables: access denied " --log-level 7 &&\
+       sudo iptables -A FORWARD -i eth2 -o eth0 -m string --string "google.com" --algo kmp -j DROP &&\
+       sudo iptables -A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT &&\
+       sudo iptables -A FORWARD -i eth2 -o eth0 -j ACCEPT
    - after installing `isc-dhcp-server`
      - enabled serving DHCP requests on eth1 and eth2 (/etc/default/isc-dhcp-server)
      - configured dhcpd configuration (/etc/dhcp/dhcpd.conf):
@@ -71,22 +76,23 @@
        - domain name for both `training.com`
    - after installing `bind9`
      - added forwarders, if our dns can't give responce (/etc/bind/named.conf.options)
-     - aded listen-on for 2 internal networks (/etc/bind/named.conf.options)
-     - define 2 zones (`forward` and `reverse or arpa`) in /etc/bind/named.conf.local
+     - aded listen-on for 2 internal networks (/etc/bind/named.conf.options`)
+     - define 2 zones (`forward` and `reverse or arpa`) in `/etc/bind/named.conf.local`
      - added conf file for forward zone, where defined SOA, NS and A records for `gateway.training.com` domain
      - added conf file for reverse zone, where defined SOA, NS and PTR records for `gateway.training.com` domain
-   - enable ip forwarding (added /etc/sysctl.d/60-ipforward.conf)
-   - added iptables rules for accessing to internet via nat interface (eth0) of gateway for machines in 10.0.0.0/26 (eth2) only (our App2 VM):
-```
-#!/bin/bash
-iptables -A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT &&\
-iptables -A FORWARD -i eth2 -o eth0 -j ACCEPT &&\
-iptables -A FORWARD -i eth1 -o eth0 -j REJECT &&\
-iptables -A FORWARD -i eth0 -o eth1 -j REJECT &&\
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-```
-**Note:** 
- - Rejected connections for eth1, because otherwise they had accessing, too. 
- - ~~Didn't add rules for accepting traffic from eth2 (internal) to eth0 (nat), because it is allow by default~~ 
- - Added rules for accepting traffic from eth2 (internal) to eth0 (nat) securely (Packets ingressing from the public network (eth0) are accepted for forwarding out to the private network (eth2) if and only if the ingressing public packet is related to a conversation that was established by a host on the private network)
- - Enabled masquerading for nat interface
+   - enable ip forwarding (added `/etc/sysctl.d/60-ipforward.conf`)
+   - Configured rsyslog for getting logs from nodes (`/etc/rsyslog.d/00-myconfig.conf`), which write logs to own log file using rsyslog template:
+   - ```
+     $template RemoteHost,"/opt/logs/%HOSTNAME%/%$YEAR%%$MONTH%%$DAY%.log"
+     *.* ?RemoteHost
+     ```
+   - ran `/home/vagrant/first_deploy-keys.sh` for establishing first ssh connections with created keys
+   - created cron job (`/home/vagrant/redeploy_keys_cron`), which run `/home/vagrant/redeploy_keys.sh` and logging its output
+   - In turn `/home/vagrant/redeploy_keys.sh`:
+     - getting IPs of all nodes from dhcp leases
+     - generate new key pairs
+     - redeploying new public key to nodes, only if gateway don't have connection at least to one of them. If redeploying is succesfull, relocate symlinks to new key pairs. Otherwise (if have connections), show mesage and do nothing.
+### Which MUST be done
+ - Reject connections for eth1, because otherwise they had accessing, too. 
+ - ~~Didn't~~ Add rules for accepting traffic from eth2 (internal) to eth0 (nat) securely (Packets ingressing from the public network (eth0) are accepted for forwarding out to the private network (eth2) if and only if the ingressing public packet is related to a conversation that was established by a host on the private network)
+ - Enable masquerading for nat interface
