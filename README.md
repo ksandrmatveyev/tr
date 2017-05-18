@@ -45,11 +45,7 @@
 ### Explanation:
  - On Apps:
    - added network interface, which get configuration from dhcp (`/etc/network/interfaces`)
-   - Added pre up iptables rules (from file `/etc/iptables.rules`), which logged all incoming http traffic:  
-```
--I INPUT -i eth0 -p tcp --dport 80 -j LOG --log-prefix "iptables: HTTP IN " --log-level 4
-```
-Used `--log-level 4` for separating this section of log from main syslog  
+   - Added pre up iptables rules (from file `/etc/iptables.rules`), which logged all incoming http traffic: ```-I INPUT -i eth0 -p tcp --dport 80 -j LOG --log-prefix "iptables: HTTP IN " --log-level 4```. Used `--log-level 4` for separating this section of log from main syslog  
    - Configured logrotate for daily backuping and compressing. Also delete log backups, which older than 1 week (`/etc/logrotate.d/rsyslog`)
    - Checked if gateway available (using `/home/vagrant/ifavailable.sh`) every minute with cronjob `home/vagrant/gateway_avail_cron`
    - Configured rsyslog for deliverying logs (from cronjob, iptables and ssh activities) to gateway rsyslog (`/etc/rsyslog.d/loghost.conf`)
